@@ -1,4 +1,7 @@
 import os
+import pickle
+import sklearn
+import numpy as np
 import tkinter as tk
 from PIL import Image, ImageDraw
 
@@ -17,21 +20,44 @@ class ImageGenerator:
         self.drawing_area.bind("<Motion>", self.motion)
         self.drawing_area.bind("<ButtonPress-1>", self.b1down)
         self.drawing_area.bind("<ButtonRelease-1>", self.b1up)
-        self.button=tk.Button(self.parent,text="Guess!",width=10,bg='white',command=self.save)#  "command=..."  connects this button to the "save" method.
+        self.button=tk.Button(self.parent,text="Guess!",width=10,bg='white',command=self.save_and_guess)#  "command=..."  connects this button to the "save" method.
         self.button.place(x=self.sizex/7,y=self.sizey+20)
         self.button1=tk.Button(self.parent,text="Clear!",width=10,bg='white',command=self.clear)
         self.button1.place(x=(self.sizex/7)+80,y=self.sizey+20)
+        
+        #this is where the guess will appear
+        
 
         self.image=Image.new("RGB",(200,200),(255,255,255))
         self.draw=ImageDraw.Draw(self.image)
 
-    def save(self):#Right now this saves to the home direcotory!
+    def save_and_guess(self):#Right now this saves to the home direcotory!
+        
+        #save the image
         filename = "saved_image.jpg"
         this_files_directory = os.path.dirname(os.path.abspath(__file__))
-        print("this files dir is: " + str(this_files_directory))
+        image_path = this_files_directory+"/"+filename
+        print("path to save is: " + str(image_path))
         self.image = self.image.resize([28, 28])
-        self.image.save(this_files_directory+"/"+filename)#save the image right beside this file! Also, make sure it's 28 by 28.
+        self.image.save(image_path)#save the image right beside this file! Also, make sure it's 28 by 28.
+        
+        #transform image into greyscale 1 by 784 array with  pixels in [0, 255] range.
+        loaded_image = np.asarray(Image.open(image_path))
 
+        #get a lazy greyscale. Img is now 28 by 28. Check
+        #https://e2eml.school/convert_rgb_to_grayscale.html for a better way to do this if it isn't good enough.
+        loaded_image = np.mean(loaded_image, axis=2)
+        loaded_image = np.reshape(loaded_image, [1, 784])#TODO Am I mixing up the pixels here and losing info?
+
+        #load the model and guess
+        model_path = this_files_directory + '/../Model/trained_tree.pickle'
+        loaded_model = pickle.load(open(model_path, 'rb'))
+        prediction = str(loaded_model.predict(loaded_image))
+        print("prediction: " + prediction)
+        self.entry_var.set(prediction)
+
+
+        
     def clear(self):
         self.drawing_area.delete("all")
         self.image=Image.new("RGB",(200,200),(255,255,255))
@@ -53,6 +79,8 @@ class ImageGenerator:
 
         self.xold = event.x
         self.yold = event.y
+
+#TODO close window if it's open.
 
 if __name__ == "__main__":
     root=tk.Tk()
