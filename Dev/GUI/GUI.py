@@ -1,4 +1,5 @@
 import os
+import matplotlib.pyplot as plt
 import pickle
 import sklearn
 import numpy as np
@@ -25,12 +26,10 @@ class ImageGenerator:
         self.button1=tk.Button(self.parent,text="Clear!",width=10,bg='#f06994',command=self.clear)
         self.button1.place(x=(self.sizex/7)+80,y=self.sizey+20)
         
+        #this is where the guess will appear
         self.text = tk.Label(root, height=2, width=16)
         self.text.pack(side="bottom", pady=(0, 20))
         
-        #this is where the guess will appear
-        
-
         self.image=Image.new("RGB",(200,200),(255,255,255))
         self.draw=ImageDraw.Draw(self.image)
 
@@ -41,7 +40,8 @@ class ImageGenerator:
         this_files_directory = os.path.dirname(os.path.abspath(__file__))
         image_path = this_files_directory+"/"+filename
         print("path to save is: " + str(image_path))
-        self.image = self.image.resize([28, 28])
+        #TODO SHOW IMAGE
+        self.image = self.image.resize([28, 28])   #TODO SHOW IT
         self.image.save(image_path)#save the image right beside this file! Also, make sure it's 28 by 28.
         
         #transform image into greyscale 1 by 784 array with  pixels in [0, 255] range.
@@ -50,7 +50,7 @@ class ImageGenerator:
         #get a lazy greyscale. Img is now 28 by 28. Check
         #https://e2eml.school/convert_rgb_to_grayscale.html for a better way to do this if it isn't good enough.
         loaded_image = np.mean(loaded_image, axis=2)
-        loaded_image = np.reshape(loaded_image, [1, 784])#TODO Am I mixing up the pixels here and losing info?
+        loaded_image = np.reshape(loaded_image, [1, 784])#TODO SHOW IT
 
         #load the model and guess
         self.text["text"] = "" #clear all 12 possile characters in the text widgit first
@@ -77,8 +77,8 @@ class ImageGenerator:
     def motion(self,event):
         if self.b1 == "down":
             if self.xold is not None and self.yold is not None:
-                event.widget.create_line(self.xold,self.yold,event.x,event.y,smooth='true',width=3,fill='blue')
-                self.draw.line(((self.xold,self.yold),(event.x,event.y)),(0,128,0),width=3)
+                event.widget.create_line(self.xold,self.yold,event.x,event.y,smooth='true',width=15,fill='black')
+                self.draw.line(((self.xold,self.yold),(event.x,event.y)),(0,128,0),width=15, joint="curve")
 
         self.xold = event.x
         self.yold = event.y
