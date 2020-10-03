@@ -41,16 +41,18 @@ class ImageGenerator:
         image_path = this_files_directory+"/"+filename
         print("path to save is: " + str(image_path))
         #TODO SHOW IMAGE
-        self.image = self.image.resize([28, 28])   #TODO SHOW IT
+        self.image = self.image.resize([28, 28])   
         self.image.save(image_path)#save the image right beside this file! Also, make sure it's 28 by 28.
         
         #transform image into greyscale 1 by 784 array with  pixels in [0, 255] range.
         loaded_image = np.asarray(Image.open(image_path))
 
-        #get a lazy greyscale. Img is now 28 by 28. Check
-        #https://e2eml.school/convert_rgb_to_grayscale.html for a better way to do this if it isn't good enough.
+        #get a lazy greyscale. Img is now 28 by 28. Check out
+        #https://e2eml.school/convert_rgb_to_grayscale.html for a better way to do this if it isn't good enough. Also do a inversion.
         loaded_image = np.mean(loaded_image, axis=2)
-        loaded_image = np.reshape(loaded_image, [1, 784])#TODO SHOW IT
+        loaded_image = np.reshape(loaded_image, [1, 784])
+        loaded_image = 255 - loaded_image 
+        
 
         #load the model and guess
         self.text["text"] = "" #clear all 12 possile characters in the text widgit first
