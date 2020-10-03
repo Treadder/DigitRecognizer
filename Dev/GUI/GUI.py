@@ -24,6 +24,8 @@ class ImageGenerator:
         self.button.place(x=self.sizex/7,y=self.sizey+20)
         self.button1=tk.Button(self.parent,text="Clear!",width=10,bg='white',command=self.clear)
         self.button1.place(x=(self.sizex/7)+80,y=self.sizey+20)
+        self.text = tk.Text(root, height=2, width=30)
+        self.text.pack()
         
         #this is where the guess will appear
         
@@ -50,15 +52,15 @@ class ImageGenerator:
         loaded_image = np.reshape(loaded_image, [1, 784])#TODO Am I mixing up the pixels here and losing info?
 
         #load the model and guess
+        self.text.delete(1.0, 12.0)#clear all 12 possile characters in the text widgit first
         model_path = this_files_directory + '/../Model/trained_tree.pickle'
         loaded_model = pickle.load(open(model_path, 'rb'))
-        prediction = str(loaded_model.predict(loaded_image))
+        prediction = (loaded_model.predict(loaded_image)[0])
         print("prediction: " + prediction)
-        self.entry_var.set(prediction)
+        self.text.insert(tk.END, "prediction: " + prediction)
 
-
-        
     def clear(self):
+        self.text.delete(1.0, 12.0)
         self.drawing_area.delete("all")
         self.image=Image.new("RGB",(200,200),(255,255,255))
         self.draw=ImageDraw.Draw(self.image)
