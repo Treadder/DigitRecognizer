@@ -53,7 +53,7 @@ class ImageGenerator:
         loaded_image = np.reshape(loaded_image, [1, 784])#TODO Am I mixing up the pixels here and losing info?
 
         #load the model and guess
-        self.text[:"text"] = "" #clear all 12 possile characters in the text widgit first
+        self.text["text"] = "" #clear all 12 possile characters in the text widgit first
         model_path = this_files_directory + '/../Model/trained_tree.pickle'
         loaded_model = pickle.load(open(model_path, 'rb'))
         prediction = (loaded_model.predict(loaded_image)[0])
