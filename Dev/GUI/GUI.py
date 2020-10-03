@@ -20,12 +20,13 @@ class ImageGenerator:
         self.drawing_area.bind("<Motion>", self.motion)
         self.drawing_area.bind("<ButtonPress-1>", self.b1down)
         self.drawing_area.bind("<ButtonRelease-1>", self.b1up)
-        self.button=tk.Button(self.parent,text="Guess!",width=10,bg='white',command=self.save_and_guess)#  "command=..."  connects this button to the "save" method.
+        self.button=tk.Button(self.parent,text="Guess!",width=10,bg='#81eb96',command=self.save_and_guess)#  "command=..."  connects this button to the "save" method.
         self.button.place(x=self.sizex/7,y=self.sizey+20)
-        self.button1=tk.Button(self.parent,text="Clear!",width=10,bg='white',command=self.clear)
+        self.button1=tk.Button(self.parent,text="Clear!",width=10,bg='#f06994',command=self.clear)
         self.button1.place(x=(self.sizex/7)+80,y=self.sizey+20)
-        self.text = tk.Text(root, height=2, width=30)
-        self.text.pack()
+        
+        self.text = tk.Label(root, height=2, width=16)
+        self.text.pack(side="bottom", pady=(0, 20))
         
         #this is where the guess will appear
         
@@ -52,15 +53,15 @@ class ImageGenerator:
         loaded_image = np.reshape(loaded_image, [1, 784])#TODO Am I mixing up the pixels here and losing info?
 
         #load the model and guess
-        self.text.delete(1.0, 12.0)#clear all 12 possile characters in the text widgit first
+        self.text[:"text"] = "" #clear all 12 possile characters in the text widgit first
         model_path = this_files_directory + '/../Model/trained_tree.pickle'
         loaded_model = pickle.load(open(model_path, 'rb'))
         prediction = (loaded_model.predict(loaded_image)[0])
         print("prediction: " + prediction)
-        self.text.insert(tk.END, "prediction: " + prediction)
+        self.text["text"] =  ("prediction: " + prediction)
 
     def clear(self):
-        self.text.delete(1.0, 12.0)
+        self.text["text"] = ""
         self.drawing_area.delete("all")
         self.image=Image.new("RGB",(200,200),(255,255,255))
         self.draw=ImageDraw.Draw(self.image)
@@ -86,8 +87,8 @@ class ImageGenerator:
 
 if __name__ == "__main__":
     root=tk.Tk()
-    root.wm_geometry("%dx%d+%d+%d" % (400, 400, 10, 10))
+    root.wm_geometry("%dx%d+%d+%d" % (222, 320, 10, 10))
     root.title("Digit Recognizer")
-    root.config(bg='grey')
+    root.config(bg="#302d63")
     ImageGenerator(root,10,10)
     root.mainloop()
