@@ -35,40 +35,39 @@ class ImageGenerator:
 
     def save_and_guess(self):#Right now this saves to the home direcotory!
 
-
-        #Order of transformations:
-        #1. Create the image, and save it at it's full resolution.             <---Done!
-        #2. Load the image from the save file, and resize it to 28x28 pixels.  <
-        #3. Use np.asarray() to make the image reshapeable.                    <
-        #4. Lazy Greyscale the image by taking the mean of all Matrices.       <
-        #5. Do 255 - Greyscaled image to reverse the colors.                   <
-        #6. Reshape the image into [785, 1] and feed the beast.                <
-        
-        #save the image
+        #1. Create the image, and save it at it's full resolution.             
         filename = "saved_image.jpg"
         this_files_directory = os.path.dirname(os.path.abspath(__file__))
         image_path = this_files_directory+"/"+filename
-        print("path to save is: " + str(image_path))
-        self.image = self.image.resize([28, 28])   
-        self.image.save(image_path)#save the image right beside this file! Also, make sure it's 28 by 28.
+        self.image.save(image_path)
         
-        #transform image into greyscale 1 by 784 array with  pixels in [0, 255] range.
-        loaded_image = np.asarray(Image.open(image_path))
-
-        #get a lazy greyscale. Img is now 28 by 28. Check out
-        #https://e2eml.school/convert_rgb_to_grayscale.html for a better way to do this if it isn't good enough. Also do a inversion.
-        loaded_image = np.mean(loaded_image, axis=2)
-        loaded_image = np.reshape(loaded_image, [1, 784])
-        loaded_image = 255 - loaded_image 
+        #2. Load the image from the save file, and resize it to 28x28 pixels.  
+        loaded_image = Image.open(image_path)
+        resized_image = loaded_image.resize([28, 28])
         
+        #3. Use np.asarray() to make the image reshapeable.                    
+        array_image = np.asarray(resized_image)
 
-        #load the model and guess
-        self.text["text"] = "" #clear all 12 possile characters in the text widgit first
+        #4. Lazy Greyscale the image by taking the mean of all Matrices.       
+        greyscale_image = np.mean(array_image, axis=2)
+
+        #5. Do 255 - Greyscaled image to reverse the colors.                   
+        inverted_image = 255 - greyscale_image
+        
+        #6 save a copy of the 28 by 28 greyscale inverted image for checking out if needed.
+        lowres_save = plt.imshow(inverted_image, cmap="binary")
+        plt.savefig(this_files_directory + "/saved_low_res.jpg")
+
+        #7. Reshape the image into [785, 1] and feed the beast.                
+        model_ready_image = inverted_image.reshape([1, 784])
+           
+        #clear text, load model, and predict!
+        self.text["text"] = "" 
         model_path = this_files_directory + '/../Model/trained_tree.pickle'
         loaded_model = pickle.load(open(model_path, 'rb'))
-        prediction = (loaded_model.predict(loaded_image)[0])
+        prediction = (loaded_model.predict(model_ready_image))
         print("prediction: " + prediction)
-        self.text["text"] =  ("prediction: " + prediction)
+        self.text["text"] =  ("prediction: " + (prediction[0]))
 
     def clear(self):
         self.text["text"] = ""
