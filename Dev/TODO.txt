@@ -1,0 +1,5 @@
+gui.py isn't saving images right? maybe save from each transform stage?
+
+Do some hyperparameter tweaking on the model too to make it more accurate.
+
+get rid of the need to load images from the saved "previous-step" images. Do it in one big operation.
